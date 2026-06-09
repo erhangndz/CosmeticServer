@@ -1,9 +1,25 @@
 using CosmeticServer.API.Data.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+//api.cosmetic.com
+// www.cosmetic.com
+
+builder.Services.AddCors(config =>
+{
+    config.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -11,7 +27,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseLazyLoadingProxies();
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(config =>
+{
+    config.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,6 +44,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
