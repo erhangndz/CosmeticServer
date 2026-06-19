@@ -151,5 +151,38 @@ namespace CosmeticServer.API.Controllers
         {
             return _context.Products.Any(e => e.Id == id);
         }
+
+
+        [HttpGet("Last4Products")]
+
+        public async Task<IActionResult> Last4Products()
+        {
+            var products = await _context.Products
+                                                  .OrderByDescending(x => x.Id)
+                                                  .Take(4)
+                                                  .ToListAsync();
+
+            var result = products.Select(p=> new ResultProductDto
+            {
+                Id = p.Id,
+                CategoryId=p.CategoryId,
+                ImageUrl = p.ImageUrl,
+                Name = p.Name,
+                Price = p.Price,
+                Category= new ResultCategoryDto
+                {
+                    Name = p.Category.Name
+                }
+            }).ToList();
+
+            return Ok(result);
+        }
+
+
+
+
     }
+
+
+
 }
